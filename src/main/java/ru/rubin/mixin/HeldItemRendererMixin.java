@@ -137,22 +137,5 @@ public abstract class HeldItemRendererMixin {
             }
         }
     }
-
-    @Redirect(
-            method = {"updateHeldItems"},
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/network/ClientPlayerEntity;getAttackCooldownProgress(F)F"
-            )
-    )
-    private float redirectAttackCooldownProgress(ClientPlayerEntity player, float baseTime) {
-        if (Rubin.isModInitialized() && Rubin.get != null && Rubin.get.manager != null) {
-            SwingAnimation swingModule = (SwingAnimation) Rubin.get.manager.getModule(SwingAnimation.class);
-            if (swingModule != null && swingModule.enable && !SwingAnimation.swingMode.is("Off") && SwingAnimation.auraCheck()) {
-                return 1.0F;
-            }
-        }
-        return player.getAttackCooldownProgress(baseTime);
-    }
 }
 
