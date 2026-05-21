@@ -26,10 +26,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import ru.rubin.Rubin;
 import ru.rubin.event.EventManager;
 import ru.rubin.event.render.HandAnimationEvent;
 import ru.rubin.event.render.RenderItemEvent;
 import ru.rubin.module.impl.combat.auraProcess.rotationProcess.impl.FreeLookUtil;
+import ru.rubin.module.impl.visuals.SwingAnimation;
 
 @Environment(EnvType.CLIENT)
 @Mixin({HeldItemRenderer.class})
@@ -113,6 +115,27 @@ public abstract class HeldItemRendererMixin {
     @Unique
     private boolean night$isChargedCrossbow(ItemStack stack) {
         return stack.isOf(Items.CROSSBOW) && CrossbowItem.isCharged(stack);
+    }
+
+    @Inject(
+            method = {"updateHeldItems"},
+            at = {@At("HEAD")}
+    )
+    private void onUpdateHeldItems(CallbackInfo ci) {
+        if (Rubin.isModInitialized() && Rubin.get != null && Rubin.get.manager != null) {
+            SwingAnimation swingModule = (SwingAnimation) Rubin.get.manager.getModule(SwingAnimation.class);
+            if (swingModule != null && swingModule.enable && !SwingAnimation.swingMode.is("Off") && SwingAnimation.auraCheck()) {
+                MinecraftClient mc = MinecraftClient.getInstance();
+                if (mc.player != null) {
+                    ItemStack currentMain = mc.player.getMainHandStack();
+                    // Prevent re-equip animation if the item hasn't actually changed
+                    if (ItemStack.areEqual(currentMain, this.mainHand)) {
+                        this.equipProgressMainHand = 1.0F;
+                        this.lastEquipProgressMainHand = 1.0F;
+                    }
+                }
+            }
+        }
     }
 }
 
