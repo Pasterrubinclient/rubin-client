@@ -119,7 +119,7 @@ public abstract class HeldItemRendererMixin {
 
     @Inject(
             method = {"updateHeldItems"},
-            at = {@At("HEAD")}
+            at = {@At("TAIL")}
     )
     private void onUpdateHeldItems(CallbackInfo ci) {
         if (Rubin.isModInitialized() && Rubin.get != null && Rubin.get.manager != null) {
@@ -128,14 +128,31 @@ public abstract class HeldItemRendererMixin {
                 MinecraftClient mc = MinecraftClient.getInstance();
                 if (mc.player != null) {
                     ItemStack currentMain = mc.player.getMainHandStack();
-                    // Prevent re-equip animation if the item hasn't actually changed
                     if (ItemStack.areEqual(currentMain, this.mainHand)) {
-                        this.equipProgressMainHand = 1.0F;
                         this.lastEquipProgressMainHand = 1.0F;
+                        this.equipProgressMainHand = 1.0F;
+                        this.mainHand = currentMain;
                     }
                 }
             }
         }
+    }
+
+    @Redirect(
+            method = {"updateHeldItems"},
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/network/ClientPlayerEntity;getAttackCooldownProgress(F)F"
+            )
+    )
+    private float redirectAttackCooldownProgress(ClientPlayerEntity player, float baseTime) {
+        if (Rubin.isModInitialized() && Rubin.get != null && Rubin.get.manager != null) {
+            SwingAnimation swingModule = (SwingAnimation) Rubin.get.manager.getModule(SwingAnimation.class);
+            if (swingModule != null && swingModule.enable && !SwingAnimation.swingMode.is("Off") && SwingAnimation.auraCheck()) {
+                return 1.0F;
+            }
+        }
+        return player.getAttackCooldownProgress(baseTime);
     }
 }
 
