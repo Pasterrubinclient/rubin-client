@@ -71,6 +71,7 @@ public class Manager {
       this.module.add(new Particles());
       this.module.add(new NoRender());
       this.module.add(new SwingAnimation());
+      this.module.add(new ru.rubin.module.impl.visuals.beautifulhands.BeautifulHands());
       this.module.add(new Hat());
       this.module.add(new TargetESP());
       this.module.add(new SkinManager());
