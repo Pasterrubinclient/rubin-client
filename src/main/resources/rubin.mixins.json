@@ -1,0 +1,53 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "ru.rubin.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "RenderLayerMultiPhaseMixin",
+    "RenderSystemMixin",
+    "RenderPhaseMixin",
+    "MinecraftClientMixin",
+    "KeyboardMixin",
+    "MouseMixin",
+    "MouseClickMixin",
+    "MouseScrollMixin",
+    "ChatScreenMixin",
+    "MouseAccessor",
+    "ClientPlayerInteractionManagerAccessor",
+    "ClientPlayerInteractionManagerMixin",
+    "MinecraftClientAccessor",
+    "InactivityFpsLimiterMixin",
+    "EntityRenderDispatcherAccessor",
+    "EntityRendererMixin",
+    "PlayerListEntryMixin",
+    "WorldRendererEntityCaptureMixin",
+    "WorldRendererMixin",
+    "CreeperTextureMixin",
+    "KeyboardInputMixin",
+    "CameraMixin",
+    "ClientPlayerEntityMixin",
+    "HeldItemRendererMixin",
+    "EntityMixin",
+    "LivingEntityMixin",
+    "ClientConnectionMixin",
+    "PlayerListEntryMixin",
+    "InGameHudMixin",
+    "ClientWorldPropertiesMixin",
+    "GameRendererMixin",
+    "SourceAccessor",
+    "SoundSystemMixin",
+    "LightmapTextureManagerMixin",
+    "FogRendererMixin",
+    "ClientWorldMixin",
+    "IItemDisplayEntity",
+    "GameRendererAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  },
+  "refmap": "client-rubin-refmap.json"
+}
