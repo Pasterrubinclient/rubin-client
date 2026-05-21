@@ -56,7 +56,7 @@ public class RichiDog extends Module {
 
         float tickDelta = event.worldRenderer().tickDelta();
         Camera camera = event.worldRenderer().camera();
-        Vec3d cameraPos = camera.getPos();
+        Vec3d cameraPos = camera.getCameraPos();
         Matrix4f positionMatrix = event.positionMatrix();
 
         if (positionMatrix == null) return;
