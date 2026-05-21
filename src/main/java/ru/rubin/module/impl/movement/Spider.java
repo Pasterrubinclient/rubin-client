@@ -202,7 +202,7 @@ public class Spider extends Module {
 
     private void handleFuntimeJump() {
         Box playerBox = mc.player.getBoundingBox(EntityPose.STANDING)
-                .offset(mc.player.getPos()).contract(1e-3);
+                .offset(mc.player.getX(), mc.player.getY(), mc.player.getZ()).contract(1e-3);
         long now = System.currentTimeMillis();
 
         if ((now - lastJumpTime) >= 400) {
