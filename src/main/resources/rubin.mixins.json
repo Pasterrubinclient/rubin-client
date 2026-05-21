@@ -42,7 +42,10 @@
     "FogRendererMixin",
     "ClientWorldMixin",
     "IItemDisplayEntity",
-    "GameRendererAccessor"
+    "GameRendererAccessor",
+    "WavyCapesMixin",
+    "WavyCapesStateMixin",
+    "TotemAngleEntityStatusMixin"
   ],
   "injectors": {
     "defaultRequire": 1
