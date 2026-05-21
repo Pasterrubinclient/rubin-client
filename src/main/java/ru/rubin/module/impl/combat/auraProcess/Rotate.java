@@ -254,31 +254,62 @@ public final class Rotate implements IMinecraft {
    }
 
    private static final ru.rubin.module.impl.combat.auraProcess.rotationProcess.impl.FunTimeAngleSmoother funTimeSmoother = new ru.rubin.module.impl.combat.auraProcess.rotationProcess.impl.FunTimeAngleSmoother();
+   private static int ftSmoothCount;
+   private static long ftLastAttackTime;
 
    public static void onFunTimeSmoothRotation(LivingEntity target, boolean canAttack) {
       if (mc.player == null || target == null) return;
 
+      if (canAttack) {
+         ftSmoothCount++;
+         ftLastAttackTime = System.currentTimeMillis();
+      }
+
+      long elapsed = System.currentTimeMillis() - ftLastAttackTime;
       Vec3d directionVec = AuraUtil.getVector3(target);
-      float targetYaw = (float) Math.toDegrees(Math.atan2(-directionVec.x, directionVec.z));
-      float targetPitch = (float) MathHelper.clamp(
+      float baseYaw = (float) Math.toDegrees(Math.atan2(-directionVec.x, directionVec.z));
+      float basePitch = (float) MathHelper.clamp(
               -Math.toDegrees(Math.atan2(directionVec.y, Math.hypot(directionVec.x, directionVec.z))), -90.0, 90.0
       );
 
-      Vec3d offset = funTimeSmoother.randomValue();
-      targetYaw += (float) offset.x;
-      targetPitch += (float) offset.y;
-
+      // Speed: fast when can attack, slow otherwise
+      float yawSpeed;
+      float pitchSpeed;
       if (canAttack) {
-         funTimeSmoother.onAttack();
+         yawSpeed = Mathf.randomValue(70.0f, 120.0f);
+         pitchSpeed = Mathf.randomValue(15.0f, 25.0f);
+      } else {
+         yawSpeed = Mathf.randomValue(20.0f, 35.0f);
+         pitchSpeed = Mathf.randomValue(5.0f, 10.0f);
       }
 
-      float[] result = funTimeSmoother.limitAngleChange(
-              FreeLookUtil.freeYaw, FreeLookUtil.freePitch,
-              targetYaw, targetPitch, target
-      );
+      // CoreDLC-style noise based on time and count
+      long time = System.currentTimeMillis();
+      float yawNoise = (float) (Math.sin(time / (double) (300 + ftSmoothCount % 100)) * 0.8 
+              + Math.cos(time / (double) (500 + ftSmoothCount % 80)) * 0.6);
+      float pitchNoise = (float) (Math.sin(time / (double) (400 + ftSmoothCount % 120)) * 0.5 
+              + Math.cos(time / (double) (600 + ftSmoothCount % 90)) * 0.4);
 
-      Rotation newRotation = new Rotation(result[0], MathHelper.clamp(result[1], -90.0f, 90.0f));
-      RotationProcess.update(newRotation, 180.0f, 180.0f, 25.0f, 25.0f, 1, 15, false);
+      // Idle jitter when not attacking recently
+      float idleYaw = 0.0f;
+      float idlePitch = 0.0f;
+      if (elapsed < 2000) {
+         int suck = ftSmoothCount % 3;
+         float phase = (float) elapsed / 40.0f + (float) (ftSmoothCount % 6);
+         float randComp = switch (suck) {
+            case 0 -> (float) Math.cos(phase);
+            case 1 -> (float) Math.sin(phase);
+            default -> (float) Math.sin(phase);
+         };
+         idleYaw = randomLerp(3.0f, 8.0f) * randComp;
+         idlePitch = randomLerp(0.5f, 2.0f) * (float) Math.cos(phase * 0.7f);
+      }
+
+      Rotation newRotation = new Rotation(
+              baseYaw + yawNoise + idleYaw,
+              MathHelper.clamp(basePitch + pitchNoise + idlePitch, -90.0f, 90.0f)
+      );
+      RotationProcess.update(newRotation, yawSpeed, pitchSpeed, 25.0f, 25.0f, 0, 15, false);
    }
 
    @Generated
