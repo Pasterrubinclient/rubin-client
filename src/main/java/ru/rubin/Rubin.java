@@ -16,7 +16,7 @@ import ru.rubin.event.render.RenderEvent;
 import ru.rubin.module.api.Manager;
 import ru.rubin.module.bind.BindingManager;
 import ru.rubin.module.impl.combat.auraProcess.rotationProcess.ComponentManager;
-import ru.rubin.rpc.RPC;
+import ru.rubin.rpc.DiscordManager;
 import ru.rubin.sound.SoundMixFilter;
 import ru.rubin.ui.draggable.DraggableManager;
 import ru.rubin.ui.gui.GuiClient;
@@ -44,7 +44,6 @@ public class Rubin implements ClientModInitializer {
    public ConfigManager configManager;
    public FriendManager friendManager;
    public GuiClient guiClient;
-   private final RPC rpc = new RPC();
    private static GlBackend backend;
    private static Renderer2D renderer;
    private static FontObject uiFont;
@@ -75,7 +74,7 @@ public class Rubin implements ClientModInitializer {
       GuiScreen.selectedCategories = this.guiManager.getCurrentCategory();
       rtx = SoundMixFilter.makeDistorterMixer();
       rtx.init();
-      this.rpc.startRpc();
+      DiscordManager.getInstance().init();
       CommandBootstrap.initialize();
       BindingManager.getInstance().initialize();
       if (this.configManager != null) {
@@ -211,11 +210,6 @@ public class Rubin implements ClientModInitializer {
    @Generated
    public GuiClient getGuiClient() {
       return this.guiClient;
-   }
-
-   @Generated
-   public RPC getRpc() {
-      return this.rpc;
    }
 
    @Generated
