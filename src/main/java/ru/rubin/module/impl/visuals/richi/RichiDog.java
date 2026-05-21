@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
@@ -74,9 +75,14 @@ public class RichiDog extends Module {
 
         model.setAngles(mc.player.age + tickDelta, brain);
 
-        VertexConsumerProvider.Immediate consumers = mc.getBufferBuilders().getEntityVertexConsumers();
-        model.render(matrices, consumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, resolveTexture());
-        consumers.draw();
+        BufferAllocator allocator = new BufferAllocator(262144);
+        VertexConsumerProvider.Immediate consumers = VertexConsumerProvider.immediate(allocator);
+        try {
+            model.render(matrices, consumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, resolveTexture());
+            consumers.draw();
+        } finally {
+            allocator.close();
+        }
 
         matrices.pop();
     }
