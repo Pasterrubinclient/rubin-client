@@ -264,7 +264,6 @@ public final class Rotate implements IMinecraft {
               -Math.toDegrees(Math.atan2(directionVec.y, Math.hypot(directionVec.x, directionVec.z))), -90.0, 90.0
       );
 
-      // Add aim point randomization
       Vec3d offset = funTimeSmoother.randomValue();
       targetYaw += (float) offset.x;
       targetPitch += (float) offset.y;
@@ -273,30 +272,13 @@ public final class Rotate implements IMinecraft {
          funTimeSmoother.onAttack();
       }
 
-      // Use actual player angles as current (not FreeLookUtil which can be stale)
-      float currentYaw = mc.player.getYaw();
-      float currentPitch = mc.player.getPitch();
-
       float[] result = funTimeSmoother.limitAngleChange(
-              currentYaw, currentPitch,
+              FreeLookUtil.freeYaw, FreeLookUtil.freePitch,
               targetYaw, targetPitch, target
       );
 
-      // Apply directly - smoother already handles speed limiting
-      float newYaw = result[0];
-      float newPitch = MathHelper.clamp(result[1], -90.0f, 90.0f);
-
-      mc.player.setYaw(newYaw);
-      mc.player.headYaw = newYaw;
-      mc.player.setPitch(newPitch);
-
-      // Keep FreeLookUtil in sync so camera doesn't snap back
-      FreeLookUtil.freeYaw = newYaw;
-      FreeLookUtil.freePitch = newPitch;
-      FreeLookUtil.active = true;
-
-      // Update body yaw
-      mc.player.bodyYaw = ru.rubin.util.player.PlayerUtil.calculateCorrectYawOffset(newYaw);
+      Rotation newRotation = new Rotation(result[0], MathHelper.clamp(result[1], -90.0f, 90.0f));
+      RotationProcess.update(newRotation, 180.0f, 180.0f, 25.0f, 25.0f, 1, 15, false);
    }
 
    @Generated
