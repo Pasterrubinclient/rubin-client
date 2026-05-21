@@ -1,4 +1,4 @@
-package ru.night.mixin;
+package ru.rubin.mixin;
 
 import com.google.common.base.MoreObjects;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
