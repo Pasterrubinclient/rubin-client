@@ -30,7 +30,7 @@ public class SoundMixFilter {
          MinecraftClient mc = MinecraftClient.getInstance();
          this.surround.setRtxDebug(false);
          this.surround.setPlayer(mc.player);
-         this.surround.setTooPerfomance(RTXSounds.performancePriority.is("РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚СЊ"));
+         this.surround.setTooPerfomance(RTXSounds.performancePriority.is("Производительность"));
          args = this.surround.getGainArgsFromWorld();
       } else if (!this.surround.getListOfTestVecs().isEmpty()) {
          int sz = this.surround.getListOfTestVecs().size();

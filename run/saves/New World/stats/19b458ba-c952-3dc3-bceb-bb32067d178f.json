@@ -1,0 +1,34 @@
+{
+  "stats": {
+    "minecraft:killed": {
+      "minecraft:chicken": 5,
+      "minecraft:sheep": 6
+    },
+    "minecraft:picked_up": {
+      "minecraft:brown_wool": 1,
+      "minecraft:white_wool": 2,
+      "minecraft:feather": 3,
+      "minecraft:chicken": 3,
+      "minecraft:mutton": 10,
+      "minecraft:light_gray_wool": 1
+    },
+    "minecraft:custom": {
+      "minecraft:sprint_one_cm": 517,
+      "minecraft:time_since_rest": 4626,
+      "minecraft:walk_one_cm": 2079,
+      "minecraft:total_world_time": 6326,
+      "minecraft:fly_one_cm": 57366,
+      "minecraft:mob_kills": 11,
+      "minecraft:sneak_time": 4,
+      "minecraft:play_time": 4626,
+      "minecraft:damage_dealt": 680,
+      "minecraft:jump": 54,
+      "minecraft:time_since_death": 4626
+    },
+    "minecraft:used": {
+      "minecraft:golden_sword": 14,
+      "minecraft:enchanted_golden_apple": 1
+    }
+  },
+  "DataVersion": 4671
+}

@@ -57,7 +57,7 @@ public class GuiScreen {
    public static boolean backspaceHeld = false;
    public static long firstBackspacePressTime = 0L;
    public static boolean showClientSettingsPopup = false;
-   public static BooleanSetting clientBlurSetting = new BooleanSetting("Р‘Р»СЋСЂ РЅР°РґР°?", true);
+   public static BooleanSetting clientBlurSetting = new BooleanSetting("Блюр нада?", true);
    public static boolean exit = false;
    public static float x;
    public static float y;

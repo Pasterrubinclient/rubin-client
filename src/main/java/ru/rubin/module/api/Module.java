@@ -75,7 +75,7 @@ public class Module extends Config {
       }
 
       if (mc.player != null) {
-         Rubin.get.manager.get(Hud.class).showNotification("on", this.name + " РІРєР»СЋС‡РµРЅ", 2400L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
+         Rubin.get.manager.get(Hud.class).showNotification("on", this.name + " включен", 2400L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
          SoundUtil.playSound_wav("on", 0.35F);
          mc.player.sendMessage(Text.of(this.module.name() + " enable"), false);
       }
@@ -86,7 +86,7 @@ public class Module extends Config {
    public void onDisable() {
       EventManager.unregister(this);
       if (mc.player != null) {
-         Rubin.get.manager.get(Hud.class).showNotification("off", this.name + " РІС‹РєР»СЋС‡РµРЅ", 2400L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
+         Rubin.get.manager.get(Hud.class).showNotification("off", this.name + " выключен", 2400L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
          SoundUtil.playSound_wav("off", 0.35F);
          mc.player.sendMessage(Text.of(this.module.name() + " disable"), false);
       }

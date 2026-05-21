@@ -64,8 +64,8 @@ public class AutoSwap extends Module {
                Rubin.get
                   .manager
                   .get(Hud.class)
-                  .showNotification("warn", "AutoSwap - СЃРІР°РїРЅСѓР» РЅР° " + this.bypassItemName, 1200L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
-               Text msg = Text.literal("AutoSwap - СЃРІР°РїРЅСѓР» РЅР° ")
+                  .showNotification("warn", "AutoSwap - свапнул на " + this.bypassItemName, 1200L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
+               Text msg = Text.literal("AutoSwap - свапнул на ")
                   .formatted(Formatting.WHITE)
                   .append(Text.literal(this.bypassItemName).formatted(Formatting.RED));
                mc.player.sendMessage(msg, false);

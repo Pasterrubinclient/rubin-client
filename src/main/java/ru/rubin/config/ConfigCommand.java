@@ -105,7 +105,7 @@ public final class ConfigCommand implements Command {
       if (name != null && !name.isBlank()) {
          ConfigManager configManager = Rubin.get.configManager;
          if (configManager.saveConfig(name)) {
-            Rubin.get.manager.get(Hud.class).showNotification("cfg", "РЎРѕС…СЂР°РЅРµРЅ РєРѕРЅС„РёРі " + name, 6000L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
+            Rubin.get.manager.get(Hud.class).showNotification("cfg", "Сохранен конфиг " + name, 6000L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
             context.sendSuccess("Config '" + name + "' saved");
          } else {
             throw new CommandException("Failed to save config '" + name + "'");
@@ -119,7 +119,7 @@ public final class ConfigCommand implements Command {
       if (name != null && !name.isBlank()) {
          ConfigManager configManager = Rubin.get.configManager;
          if (configManager.loadConfig(name)) {
-            Rubin.get.manager.get(Hud.class).showNotification("cfg", "Р—Р°РіСЂСѓР¶РµРЅ РєРѕРЅС„РёРі " + name, 6000L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
+            Rubin.get.manager.get(Hud.class).showNotification("cfg", "Загружен конфиг " + name, 6000L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
             context.sendSuccess("Config '" + name + "' loaded");
          } else {
             throw new CommandException("Config '" + name + "' not found or failed to load");
@@ -155,7 +155,7 @@ public final class ConfigCommand implements Command {
       if (name != null && !name.isBlank()) {
          ConfigManager configManager = Rubin.get.configManager;
          if (configManager.deleteConfig(name)) {
-            Rubin.get.manager.get(Hud.class).showNotification("cfg", "РЈРґР°Р»РµРЅ РєРѕРЅС„РёРі " + name, 6000L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
+            Rubin.get.manager.get(Hud.class).showNotification("cfg", "Удален конфиг " + name, 6000L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
             context.sendSuccess("Config '" + name + "' deleted");
          } else {
             throw new CommandException("Config '" + name + "' not found or failed to delete");

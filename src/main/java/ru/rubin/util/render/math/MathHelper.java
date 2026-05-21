@@ -224,7 +224,7 @@ public class MathHelper {
 
    public static float invertScaleValue(float value, float minInput, float maxInput, float minOutput, float maxOutput) {
       if (maxInput - minInput == 0.0F) {
-         throw new IllegalArgumentException("Р”РёР°РїР°Р·РѕРЅ РІС…РѕРґРЅС‹С… Р·РЅР°С‡РµРЅРёР№ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ СЂР°РІРµРЅ РЅСѓР»СЋ.");
+         throw new IllegalArgumentException("Диапазон входных значений не может быть равен нулю.");
       } else {
          float scaledValue = (maxInput - value) / (maxInput - minInput) * (maxOutput - minOutput) + minOutput;
          return Math.max(minOutput, Math.min(maxOutput, scaledValue));
@@ -233,7 +233,7 @@ public class MathHelper {
 
    public static float scaleValue(float value, float minInput, float maxInput, float minOutput, float maxOutput) {
       if (maxInput - minInput == 0.0F) {
-         throw new IllegalArgumentException("Р”РёР°РїР°Р·РѕРЅ РІС…РѕРґРЅС‹С… Р·РЅР°С‡РµРЅРёР№ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ СЂР°РІРµРЅ РЅСѓР»СЋ.");
+         throw new IllegalArgumentException("Диапазон входных значений не может быть равен нулю.");
       } else {
          float scaledValue = (value - minInput) / (maxInput - minInput) * (maxOutput - minOutput) + minOutput;
          return Math.max(minOutput, Math.min(maxOutput, scaledValue));
