@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.rubin.event.EventManager;
 import ru.rubin.event.render.HandAnimationEvent;
@@ -33,74 +34,85 @@ import ru.rubin.module.impl.combat.auraProcess.rotationProcess.impl.FreeLookUtil
 @Environment(EnvType.CLIENT)
 @Mixin({HeldItemRenderer.class})
 public abstract class HeldItemRendererMixin {
-   @Shadow
-   private ItemStack mainHand;
-   @Shadow
-   private ItemStack offHand;
-   @Shadow
-   private float equipProgressMainHand;
-   @Shadow
-   private float lastEquipProgressMainHand;
-   @Shadow
-   private float equipProgressOffHand;
-   @Shadow
-   private float lastEquipProgressOffHand;
+    @Shadow
+    private ItemStack mainHand;
+    @Shadow
+    private ItemStack offHand;
+    @Shadow
+    private float equipProgressMainHand;
+    @Shadow
+    private float lastEquipProgressMainHand;
+    @Shadow
+    private float equipProgressOffHand;
+    @Shadow
+    private float lastEquipProgressOffHand;
 
-   @Shadow
-   protected abstract void renderFirstPersonItem(
-      AbstractClientPlayerEntity var1, float var2, float var3, Hand var4, float var5, ItemStack var6, float var7, MatrixStack var8, OrderedRenderCommandQueue var9, int var10
-   );
+    @Shadow
+    protected abstract void renderFirstPersonItem(
+            AbstractClientPlayerEntity var1, float var2, float var3, Hand var4, float var5, ItemStack var6, float var7, MatrixStack var8, OrderedRenderCommandQueue var9, int var10
+    );
 
-   @Inject(
-      method = {"renderFirstPersonItem"},
-      at = {@At("HEAD")}
-   )
-   private void onRenderFirstPersonItem(
-      AbstractClientPlayerEntity player, float tickProgress, float pitch, Hand hand, float swingProgress, ItemStack stack, float equipProgress, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, CallbackInfo ci
-   ) {
-      RenderItemEvent renderItemEvent = new RenderItemEvent(matrices, hand);
-      EventManager.call(renderItemEvent);
-   }
+    @Inject(
+            method = {"renderFirstPersonItem"},
+            at = {@At("HEAD")}
+    )
+    private void onRenderFirstPersonItem(
+            AbstractClientPlayerEntity player, float tickProgress, float pitch, Hand hand, float swingProgress, ItemStack stack, float equipProgress, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, CallbackInfo ci
+    ) {
+        RenderItemEvent renderItemEvent = new RenderItemEvent(matrices, hand);
+        EventManager.call(renderItemEvent);
+    }
 
-   @Inject(
-      method = {"renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/network/ClientPlayerEntity;I)V"},
-      at = {@At("HEAD")}
-   )
-   private void fixHandPositionWithRotations(float tickProgress, MatrixStack matrices, OrderedRenderCommandQueue orderedRenderCommandQueue, ClientPlayerEntity player, int light, CallbackInfo ci) {
-      float cameraYaw = player.getYaw(tickProgress);
-      float bodyYaw = MathHelper.lerp(tickProgress, player.lastBodyYaw, player.bodyYaw);
-      float yawDifference = cameraYaw - bodyYaw;
+    @Redirect(
+            method = {"renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/network/ClientPlayerEntity;I)V"},
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/network/ClientPlayerEntity;getYaw(F)F"
+            )
+    )
+    private float redirectGetYaw(ClientPlayerEntity instance, float tickProgress) {
+        return MinecraftClient.getInstance().gameRenderer.getCamera().getYaw();
+    }
 
-      matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yawDifference));
-   }
+    @Redirect(
+            method = {"renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/network/ClientPlayerEntity;I)V"},
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/network/ClientPlayerEntity;getPitch(F)F"
+            )
+    )
+    private float redirectGetPitch(ClientPlayerEntity instance, float tickProgress) {
+        return MinecraftClient.getInstance().gameRenderer.getCamera().getPitch();
+    }
 
-   @WrapOperation(
-      method = {"renderFirstPersonItem"},
-      at = {@At(
-         value = "INVOKE",
-         target = "Lnet/minecraft/client/render/item/HeldItemRenderer;swingArm(FLnet/minecraft/client/util/math/MatrixStack;ILnet/minecraft/util/Arm;)V"
-      )}
-   )
-   private void handAnimationHook(
-      HeldItemRenderer instance,
-      float swingProgress,
-      MatrixStack matrices,
-      int armX,
-      Arm arm,
-      Operation<Void> original,
-      @Local(ordinal = 0,argsOnly = true) AbstractClientPlayerEntity player,
-      @Local(ordinal = 0,argsOnly = true) Hand hand
-   ) {
-      HandAnimationEvent event = new HandAnimationEvent(matrices, hand, swingProgress);
-      EventManager.call(event);
+    @WrapOperation(
+            method = {"renderFirstPersonItem"},
+            at = {@At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/item/HeldItemRenderer;swingArm(FLnet/minecraft/client/util/math/MatrixStack;ILnet/minecraft/util/Arm;)V"
+            )}
+    )
+    private void handAnimationHook(
+            HeldItemRenderer instance,
+            float swingProgress,
+            MatrixStack matrices,
+            int armX,
+            Arm arm,
+            Operation<Void> original,
+            @Local(ordinal = 0,argsOnly = true) AbstractClientPlayerEntity player,
+            @Local(ordinal = 0,argsOnly = true) Hand hand
+    ) {
+        HandAnimationEvent event = new HandAnimationEvent(matrices, hand, swingProgress);
+        EventManager.call(event);
 
-      if (!event.isCancelled()) {
-         original.call(instance, swingProgress, matrices, armX, arm);
-      }
-   }
+        if (!event.isCancelled()) {
+            original.call(instance, swingProgress, matrices, armX, arm);
+        }
+    }
 
-   @Unique
-   private boolean Rubin$isChargedCrossbow(ItemStack stack) {
-      return stack.isOf(Items.CROSSBOW) && CrossbowItem.isCharged(stack);
-   }
+    @Unique
+    private boolean night$isChargedCrossbow(ItemStack stack) {
+        return stack.isOf(Items.CROSSBOW) && CrossbowItem.isCharged(stack);
+    }
 }
+
