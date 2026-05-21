@@ -253,6 +253,35 @@ public final class Rotate implements IMinecraft {
       }
    }
 
+   private static final ru.rubin.module.impl.combat.auraProcess.rotationProcess.impl.FunTimeAngleSmoother funTimeSmoother = new ru.rubin.module.impl.combat.auraProcess.rotationProcess.impl.FunTimeAngleSmoother();
+
+   public static void onFunTimeSmoothRotation(LivingEntity target, boolean canAttack) {
+      if (mc.player == null || target == null) return;
+
+      Vec3d directionVec = AuraUtil.getVector3(target);
+      float targetYaw = (float) Math.toDegrees(Math.atan2(-directionVec.x, directionVec.z));
+      float targetPitch = (float) MathHelper.clamp(
+              -Math.toDegrees(Math.atan2(directionVec.y, Math.hypot(directionVec.x, directionVec.z))), -90.0, 90.0
+      );
+
+      // Add aim point randomization
+      Vec3d offset = funTimeSmoother.randomValue();
+      targetYaw += (float) offset.x;
+      targetPitch += (float) offset.y;
+
+      if (canAttack) {
+         funTimeSmoother.onAttack();
+      }
+
+      float[] result = funTimeSmoother.limitAngleChange(
+              FreeLookUtil.freeYaw, FreeLookUtil.freePitch,
+              targetYaw, targetPitch, target
+      );
+
+      Rotation newRotation = new Rotation(result[0], result[1]);
+      RotationProcess.update(newRotation, 180.0f, 180.0f, 25.0f, 25.0f, 0, 15, false);
+   }
+
    @Generated
    private Rotate() {
       throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
