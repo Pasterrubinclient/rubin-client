@@ -201,13 +201,18 @@ public class Spider extends Module {
     }
 
     private void handleFuntimeJump() {
-        Box playerBox = mc.player.getBoundingBox(EntityPose.STANDING)
-                .offset(mc.player.getX(), mc.player.getY(), mc.player.getZ()).contract(1e-3);
+        Box standingBox = mc.player.getBoundingBox(EntityPose.STANDING);
+        double px = mc.player.getX();
+        double py = mc.player.getY();
+        double pz = mc.player.getZ();
+        Box playerBox = standingBox.offset(px, py, pz).contract(1e-3);
         long now = System.currentTimeMillis();
 
         if ((now - lastJumpTime) >= 400) {
+            // Check zone: from center.y - 0.2 to minY + 0.4 (original logic)
+            double centerY = playerBox.getCenter().y;
             Box checkBox = new Box(
-                    playerBox.minX, playerBox.getCenter().y - 0.2, playerBox.minZ,
+                    playerBox.minX, centerY - 0.2, playerBox.minZ,
                     playerBox.maxX, playerBox.minY + 0.4, playerBox.maxZ
             );
 
@@ -220,6 +225,7 @@ public class Spider extends Module {
             if (hasCollision) {
                 mc.player.setOnGround(true);
                 mc.player.setVelocity(mc.player.getVelocity().x, 0.6, mc.player.getVelocity().z);
+                lastJumpTime = now;
             }
         }
     }
