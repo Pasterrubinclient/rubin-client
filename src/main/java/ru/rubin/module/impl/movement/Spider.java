@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -14,11 +15,13 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import ru.rubin.event.EventInit;
 import ru.rubin.event.lifecycle.ClientTickEvent;
+import ru.rubin.event.player.EventJump;
 import ru.rubin.module.api.Category;
 import ru.rubin.module.api.IModule;
 import ru.rubin.module.api.Module;
@@ -29,11 +32,12 @@ import ru.rubin.module.api.setting.impl.ModeSetting;
 @Environment(EnvType.CLIENT)
 public class Spider extends Module {
 
-    public static ModeSetting mode = new ModeSetting("Режим", "FunTime", "FunTime", "SpookyTime", "FunSky", "Water", "Slime Block", "FunTime Fly");
+    public static ModeSetting mode = new ModeSetting("Режим", "FunTime", "FunTime", "SpookyTime", "FunSky", "Water", "Slime Block", "FunTime Fly", "FuntimeJump");
 
     private long lastActionTime;
     private int slimeCounter;
     private long lastTimerReset;
+    private long lastJumpTime;
 
     public Spider() {
         this.addSettings(new Setting[]{mode});
@@ -47,6 +51,12 @@ public class Spider extends Module {
         lastActionTime = 0L;
         slimeCounter = 0;
         lastTimerReset = 0L;
+        lastJumpTime = 0L;
+    }
+
+    @EventInit
+    public void onJump(EventJump event) {
+        lastJumpTime = System.currentTimeMillis();
     }
 
     @EventInit
@@ -60,6 +70,7 @@ public class Spider extends Module {
             case "Water" -> handleWater();
             case "Slime Block" -> handleSlimeBlock();
             case "FunTime Fly" -> handleFunTimeFly();
+            case "FuntimeJump" -> handleFuntimeJump();
         }
     }
 
@@ -186,6 +197,30 @@ public class Spider extends Module {
             lastTimerReset = now;
         } else {
             mc.player.sendMessage(net.minecraft.text.Text.literal("§cSpider: нужен громоотвод!"), false);
+        }
+    }
+
+    private void handleFuntimeJump() {
+        Box playerBox = mc.player.getBoundingBox(EntityPose.STANDING)
+                .offset(mc.player.getPos()).contract(1e-3);
+        long now = System.currentTimeMillis();
+
+        if ((now - lastJumpTime) >= 400) {
+            Box checkBox = new Box(
+                    playerBox.minX, playerBox.getCenter().y - 0.2, playerBox.minZ,
+                    playerBox.maxX, playerBox.minY + 0.4, playerBox.maxZ
+            );
+
+            boolean hasCollision = BlockPos.stream(checkBox).anyMatch(pos -> {
+                return mc.world.getBlockState(pos).getCollisionShape(mc.world, pos)
+                        .getBoundingBoxes().stream()
+                        .anyMatch(box -> box.getLengthY() > 0.1);
+            });
+
+            if (hasCollision) {
+                mc.player.setOnGround(true);
+                mc.player.setVelocity(mc.player.getVelocity().x, 0.6, mc.player.getVelocity().z);
+            }
         }
     }
 
