@@ -92,7 +92,7 @@ public class Spider extends Module {
         if (bucketSlot == -1) return;
         if (!mc.player.horizontalCollision) return;
 
-        mc.player.getInventory().selectedSlot = bucketSlot;
+        mc.player.getInventory().setSelectedSlot(bucketSlot);
         mc.player.setVelocity(mc.player.getVelocity().x, 0.29, mc.player.getVelocity().z);
     }
 
@@ -138,7 +138,7 @@ public class Spider extends Module {
         int bucketSlot = findHotbarItem(Items.WATER_BUCKET);
         if (bucketSlot == -1) return;
 
-        mc.player.getInventory().selectedSlot = bucketSlot;
+        mc.player.getInventory().setSelectedSlot(bucketSlot);
         if (mc.player.horizontalCollision) {
             mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
         }
@@ -157,7 +157,7 @@ public class Spider extends Module {
         int slimeSlot = findHotbarSlimeBlock();
         if (slimeSlot == -1) return;
 
-        mc.player.getInventory().selectedSlot = slimeSlot;
+        mc.player.getInventory().setSelectedSlot(slimeSlot);
         mc.player.setPitch(54.0f);
         mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHit);
         mc.player.swingHand(Hand.MAIN_HAND);
@@ -212,7 +212,7 @@ public class Spider extends Module {
         int inv = findInventoryItem(item);
         if (inv == -1) return -1;
 
-        int selectedSlot = mc.player.getInventory().selectedSlot;
+        int selectedSlot = mc.player.getInventory().getSelectedSlot();
         mc.interactionManager.clickSlot(
                 mc.player.currentScreenHandler.syncId, inv, selectedSlot,
                 SlotActionType.SWAP, mc.player);
@@ -236,8 +236,8 @@ public class Spider extends Module {
     }
 
     private void useLeverAtWall(int slot) {
-        int prevSlot = mc.player.getInventory().selectedSlot;
-        mc.player.getInventory().selectedSlot = slot;
+        int prevSlot = mc.player.getInventory().getSelectedSlot();
+        mc.player.getInventory().setSelectedSlot(slot);
 
         float yaw = mc.player.getYaw();
         BlockHitResult hit = raycastWall(yaw, 75.0f, 4.5);
@@ -245,12 +245,12 @@ public class Spider extends Module {
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hit);
         }
 
-        mc.player.getInventory().selectedSlot = prevSlot;
+        mc.player.getInventory().setSelectedSlot(prevSlot);
     }
 
     private void useWaterBucketUp(int slot) {
-        int prevSlot = mc.player.getInventory().selectedSlot;
-        mc.player.getInventory().selectedSlot = slot;
+        int prevSlot = mc.player.getInventory().getSelectedSlot();
+        mc.player.getInventory().setSelectedSlot(slot);
 
         float prevPitch = mc.player.getPitch();
         mc.player.setPitch(-90.0f);
@@ -259,12 +259,12 @@ public class Spider extends Module {
         mc.player.setVelocity(mc.player.getVelocity().x, 0.45, mc.player.getVelocity().z);
         mc.player.setPitch(prevPitch);
 
-        mc.player.getInventory().selectedSlot = prevSlot;
+        mc.player.getInventory().setSelectedSlot(prevSlot);
     }
 
     private void placeRodAbove(int slot) {
-        int prevSlot = mc.player.getInventory().selectedSlot;
-        mc.player.getInventory().selectedSlot = slot;
+        int prevSlot = mc.player.getInventory().getSelectedSlot();
+        mc.player.getInventory().setSelectedSlot(slot);
 
         BlockPos playerPos = mc.player.getBlockPos();
         for (int i = 1; i <= 2; i++) {
@@ -277,7 +277,7 @@ public class Spider extends Module {
             }
         }
 
-        mc.player.getInventory().selectedSlot = prevSlot;
+        mc.player.getInventory().setSelectedSlot(prevSlot);
     }
 
     private BlockHitResult raycastWall(float yaw, float pitch, double distance) {
