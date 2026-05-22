@@ -2,6 +2,7 @@ package ru.rubin.module.impl.visuals;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import ru.rubin.Rubin;
 import ru.rubin.module.api.Category;
 import ru.rubin.module.api.IModule;
 import ru.rubin.module.api.Module;
@@ -10,11 +11,6 @@ import ru.rubin.module.api.setting.impl.BooleanSetting;
 import ru.rubin.module.api.setting.impl.ModeSetting;
 import ru.rubin.module.api.setting.impl.SliderSetting;
 
-/**
- * Chams - рисует подсветку моделей игроков (через стены).
- * Работает через мixin в EntityRendererMixin / LivingEntityMixin.
- * Включает/выключает depth test при рендере entity.
- */
 @IModule(name = "Chams", description = "Подсветка игроков через стены", category = Category.Visuals, bind = -1)
 @Environment(EnvType.CLIENT)
 public class Chams extends Module {
@@ -43,8 +39,8 @@ public class Chams extends Module {
             return false;
         }
 
-        if (ru.rubin.Rubin.get == null || ru.rubin.Rubin.get.manager == null) return false;
-        Chams chams = (Chams) ru.rubin.Rubin.get.manager.getModule(Chams.class);
+        if (Rubin.get == null || Rubin.get.manager == null) return false;
+        Chams chams = (Chams) Rubin.get.manager.getModule(Chams.class);
         if (chams == null || !chams.enable) return false;
 
         boolean isFriend = Rubin.get.friendManager.isFriend(player.getName().getString());
