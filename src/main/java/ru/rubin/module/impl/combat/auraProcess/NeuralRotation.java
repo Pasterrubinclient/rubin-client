@@ -126,62 +126,42 @@ public final class NeuralRotation implements IMinecraft {
         targetYaw += noiseYaw;
         targetPitch = MathHelper.clamp(targetPitch + noisePitch, -90.0f, 90.0f);
 
-        // --- Momentum / Inertia simulation ---
+        // --- Direct aim (no momentum when close/circling) ---
         float currentYaw = FreeLookUtil.freeYaw;
         float currentPitch = FreeLookUtil.freePitch;
 
+        // Speed based on distance to target angle
         float desiredDeltaYaw = MathHelper.wrapDegrees(targetYaw - currentYaw);
         float desiredDeltaPitch = targetPitch - currentPitch;
-
-        // Momentum: 35% of previous direction preserved (lighter than before)
-        float friction = 0.30f + gaussian() * 0.05f;
-        friction = MathHelper.clamp(friction, 0.20f, 0.40f);
-        momentumYaw = momentumYaw * friction + desiredDeltaYaw * (1.0f - friction);
-        momentumPitch = momentumPitch * friction + desiredDeltaPitch * (1.0f - friction);
+        float distToTarget = (float) Math.hypot(desiredDeltaYaw, desiredDeltaPitch);
 
         // --- Acceleration curve ---
-        float distToTarget = (float) Math.hypot(desiredDeltaYaw, desiredDeltaPitch);
-        if (distToTarget > 5.0f) {
+        if (distToTarget > 8.0f) {
             accelerationPhase = Math.min(1.0f, accelerationPhase + 0.2f);
         } else {
-            accelerationPhase = Math.max(0.0f, accelerationPhase - 0.06f);
+            accelerationPhase = Math.max(0.0f, accelerationPhase - 0.1f);
         }
 
-        // Speed: much faster base, still has variance
-        float baseSpeed = 40.0f + accelerationPhase * 60.0f; // 40-100 degrees/tick
+        float baseSpeed = 45.0f + accelerationPhase * 55.0f; // 45-100
         if (isAttack) {
             baseSpeed += 40.0f + gaussian() * 10.0f;
         }
 
-        // Add human-like speed variance (not constant)
-        float speedVariance = 1.0f + gaussian() * 0.15f;
-        float yawSpeed = Math.max(8.0f, baseSpeed * speedVariance);
-        float pitchSpeed = Math.max(5.0f, baseSpeed * 0.6f * speedVariance);
+        // Human-like speed variance
+        float speedVariance = 1.0f + gaussian() * 0.12f;
+        float yawSpeed = Math.max(20.0f, baseSpeed * speedVariance);
+        float pitchSpeed = Math.max(12.0f, baseSpeed * 0.6f * speedVariance);
 
         // --- Reaction delay simulation ---
-        // First 2 ticks: slightly slower (subtle, not blocking)
         if (ticksSinceTarget < 2) {
             float reactionMultiplier = 0.6f + (ticksSinceTarget * 0.2f);
             yawSpeed *= reactionMultiplier;
             pitchSpeed *= reactionMultiplier;
         }
 
-        // --- Apply via RotationProcess ---
-        // Use momentum-adjusted target rather than raw target
-        float outputYaw = currentYaw + momentumYaw;
-        float outputPitch = MathHelper.clamp(currentPitch + momentumPitch, -90.0f, 90.0f);
-
-        // Smooth with previous output (light smoothing only)
-        outputYaw = MathHelper.lerp(0.3f, lastOutputYaw, outputYaw);
-        if (Math.abs(MathHelper.wrapDegrees(outputYaw - lastOutputYaw)) > 25.0f) {
-            outputYaw = currentYaw + momentumYaw;
-        }
-
-        lastOutputYaw = outputYaw;
-        lastOutputPitch = outputPitch;
-
-        Rotation newRotation = new Rotation(outputYaw, outputPitch);
-        RotationProcess.update(newRotation, yawSpeed, pitchSpeed, 20.0f, 20.0f, 0, 15, false);
+        // --- Apply directly to RotationProcess (no momentum/lerp) ---
+        Rotation newRotation = new Rotation(targetYaw, targetPitch);
+        RotationProcess.update(newRotation, yawSpeed, pitchSpeed, 22.0f, 22.0f, 0, 15, false);
     }
 
     // --- Utility ---
