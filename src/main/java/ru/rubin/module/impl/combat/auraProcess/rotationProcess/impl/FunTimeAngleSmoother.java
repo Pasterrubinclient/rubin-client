@@ -9,10 +9,7 @@ import ru.rubin.util.other.IMinecraft;
 
 import java.security.SecureRandom;
 
-/**
- * FunTime-style angle smoothing algorithm.
- * Provides human-like rotation smoothing with noise and variable speed.
- */
+
 @Environment(EnvType.CLIENT)
 public class FunTimeAngleSmoother implements IMinecraft {
 
@@ -30,14 +27,14 @@ public class FunTimeAngleSmoother implements IMinecraft {
     }
 
     /**
-     * Limits angle change from current to target with FunTime-style smoothing.
+     * брбр потопим
      *
      * @param currentYaw   current yaw
      * @param currentPitch current pitch
      * @param targetYaw    desired yaw
      * @param targetPitch  desired pitch
-     * @param entity       target entity (can be null for idle smoothing)
-     * @return float[2] = {newYaw, newPitch}
+     * @param entity       target entity (жескибупас)
+     * @return float[2] = {yaw, nитч тытыч}
      */
     public float[] limitAngleChange(float currentYaw, float currentPitch, float targetYaw, float targetPitch, Entity entity) {
         float yawDelta = MathHelper.wrapDegrees(targetYaw - currentYaw);
@@ -68,7 +65,6 @@ public class FunTimeAngleSmoother implements IMinecraft {
         float newYaw = MathHelper.lerp(lerpFactor, currentYaw, currentYaw + moveYaw);
         float newPitch = MathHelper.lerp(randomLerp(speed, speed + 0.3f), currentPitch, currentPitch + movePitch);
 
-        // Add subtle noise for human-like behavior
         long time = System.currentTimeMillis();
         float yawNoise = (float) (Math.sin(time / (double) (300 + count % 100)) * 0.008 + Math.cos(time / (double) (500 + count % 80)) * 0.006);
         float pitchNoise = (float) (Math.sin(time / (double) (400 + count % 120)) * 0.005 + Math.cos(time / (double) (600 + count % 90)) * 0.004);
@@ -112,9 +108,7 @@ public class FunTimeAngleSmoother implements IMinecraft {
         return new float[]{newYaw, newPitch};
     }
 
-    /**
-     * Returns a random Vec3d offset for aim point randomization.
-     */
+
     public Vec3d randomValue() {
         return new Vec3d(
                 0.04 + (Math.random() - 0.5) * 0.04,

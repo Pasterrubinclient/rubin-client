@@ -76,6 +76,7 @@ public class Manager {
       this.module.add(new ru.rubin.rpc.DiscordRPCModule());
       this.module.add(new ru.rubin.module.impl.visuals.KillEffects());
       this.module.add(new ru.rubin.module.impl.movement.Spider());
+      this.module.add(new ru.rubin.module.impl.combat.autoswap.AutoSwapModule());
       this.module.add(new ru.rubin.module.impl.visuals.WavyCapes());
       this.module.add(new ru.rubin.module.impl.visuals.TotemAngle());
       this.module.add(new Hat());
