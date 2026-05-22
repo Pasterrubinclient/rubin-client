@@ -134,14 +134,14 @@ public final class Rotate implements IMinecraft {
 
       double distToTarget = mc.player.distanceTo(target);
       float targetYawRaw = target.getYaw();
-      float yawDelta = net.minecraft.util.math.MathHelper.wrapDegrees(target.getYaw() - target.prevYaw);
+      float yawDelta = net.minecraft.util.math.MathHelper.wrapDegrees(target.getYaw() - target.lastYaw);
       float predictStrength = distToTarget <= 2.0 ? 0.19f : 0.15f;
       if (distToTarget > 2.0) {
          targetYawRaw += yawDelta * 2.5f;
       }
       double yawRad = Math.toRadians(targetYawRaw);
       Vec3d forward = new Vec3d(-Math.sin(yawRad), 0.0, Math.cos(yawRad));
-      Vec3d predictedPos = target.getPos().add(forward.multiply(predictStrength)).add(0.0, target.getHeight() * 0.7, 0.0);
+      Vec3d predictedPos = new Vec3d(target.getX(), target.getY(), target.getZ()).add(forward.multiply(predictStrength)).add(0.0, target.getHeight() * 0.7, 0.0);
       Vec3d aimVec = predictedPos.subtract(mc.player.getEyePos());
 
       float yawToTarget = (float) Math.toDegrees(Math.atan2(-aimVec.x, aimVec.z));

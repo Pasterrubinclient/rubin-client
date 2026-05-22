@@ -47,7 +47,7 @@ public class Chams extends Module {
         Chams chams = (Chams) ru.rubin.Rubin.get.manager.getModule(Chams.class);
         if (chams == null || !chams.enable) return false;
 
-        boolean isFriend = ru.rubin.config.friend.FriendManager.isFriend(player.getName().getString());
+        boolean isFriend = Rubin.get.friendManager.isFriend(player.getName().getString());
         if (targets.is("Enemies") && isFriend) return false;
         if (targets.is("Friends") && !isFriend) return false;
 
@@ -57,7 +57,7 @@ public class Chams extends Module {
     public static int getColor(net.minecraft.entity.Entity entity) {
         boolean isFriend = false;
         if (entity instanceof net.minecraft.entity.player.PlayerEntity player) {
-            isFriend = ru.rubin.config.friend.FriendManager.isFriend(player.getName().getString());
+            isFriend = Rubin.get.friendManager.isFriend(player.getName().getString());
         }
 
         int a = (int) alpha.get();
