@@ -133,25 +133,24 @@ public final class NeuralRotation implements IMinecraft {
         float desiredDeltaYaw = MathHelper.wrapDegrees(targetYaw - currentYaw);
         float desiredDeltaPitch = targetPitch - currentPitch;
 
-        // Momentum: 60% of previous direction preserved (like physical mouse)
-        float friction = 0.55f + gaussian() * 0.05f;
-        friction = MathHelper.clamp(friction, 0.45f, 0.65f);
+        // Momentum: 35% of previous direction preserved (lighter than before)
+        float friction = 0.30f + gaussian() * 0.05f;
+        friction = MathHelper.clamp(friction, 0.20f, 0.40f);
         momentumYaw = momentumYaw * friction + desiredDeltaYaw * (1.0f - friction);
         momentumPitch = momentumPitch * friction + desiredDeltaPitch * (1.0f - friction);
 
         // --- Acceleration curve ---
-        // Ramp up speed when starting to track, decay when close
         float distToTarget = (float) Math.hypot(desiredDeltaYaw, desiredDeltaPitch);
         if (distToTarget > 5.0f) {
-            accelerationPhase = Math.min(1.0f, accelerationPhase + 0.12f);
+            accelerationPhase = Math.min(1.0f, accelerationPhase + 0.2f);
         } else {
-            accelerationPhase = Math.max(0.0f, accelerationPhase - 0.08f);
+            accelerationPhase = Math.max(0.0f, accelerationPhase - 0.06f);
         }
 
-        // Smooth speed based on acceleration phase
-        float baseSpeed = 15.0f + accelerationPhase * 45.0f; // 15-60 degrees/tick
+        // Speed: much faster base, still has variance
+        float baseSpeed = 40.0f + accelerationPhase * 60.0f; // 40-100 degrees/tick
         if (isAttack) {
-            baseSpeed += 30.0f + gaussian() * 10.0f; // burst on attack
+            baseSpeed += 40.0f + gaussian() * 10.0f;
         }
 
         // Add human-like speed variance (not constant)
@@ -160,9 +159,9 @@ public final class NeuralRotation implements IMinecraft {
         float pitchSpeed = Math.max(5.0f, baseSpeed * 0.6f * speedVariance);
 
         // --- Reaction delay simulation ---
-        // First few ticks after acquiring target: slower
-        if (ticksSinceTarget < 4) {
-            float reactionMultiplier = 0.3f + (ticksSinceTarget * 0.2f);
+        // First 2 ticks: slightly slower (subtle, not blocking)
+        if (ticksSinceTarget < 2) {
+            float reactionMultiplier = 0.6f + (ticksSinceTarget * 0.2f);
             yawSpeed *= reactionMultiplier;
             pitchSpeed *= reactionMultiplier;
         }
@@ -172,10 +171,9 @@ public final class NeuralRotation implements IMinecraft {
         float outputYaw = currentYaw + momentumYaw;
         float outputPitch = MathHelper.clamp(currentPitch + momentumPitch, -90.0f, 90.0f);
 
-        // Smooth with previous output to avoid sudden jumps
-        outputYaw = MathHelper.lerp(0.15f, lastOutputYaw, outputYaw);
-        if (Math.abs(MathHelper.wrapDegrees(outputYaw - lastOutputYaw)) > 40.0f) {
-            // Don't over-smooth large corrections
+        // Smooth with previous output (light smoothing only)
+        outputYaw = MathHelper.lerp(0.3f, lastOutputYaw, outputYaw);
+        if (Math.abs(MathHelper.wrapDegrees(outputYaw - lastOutputYaw)) > 25.0f) {
             outputYaw = currentYaw + momentumYaw;
         }
 
