@@ -46,8 +46,7 @@
     "GameRendererAccessor",
     "WavyCapesMixin",
     "WavyCapesStateMixin",
-    "TotemAngleEntityStatusMixin",
-    "HandledScreenAccessor"
+    "TotemAngleEntityStatusMixin"
   ],
   "injectors": {
     "defaultRequire": 1

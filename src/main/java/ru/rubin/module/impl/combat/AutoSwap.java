@@ -39,6 +39,7 @@ public class AutoSwap extends Module {
    public static BindSettings bind = new BindSettings("Кнопка", -1);
    public static BooleanSetting swaprender = new BooleanSetting("Показ свапа", true);
    public static BooleanSetting onlyEnchanted = new BooleanSetting("Только Чар. тотемы", false);
+   public static BooleanSetting tripleSwap = new BooleanSetting("Тройной свап", false);
    private boolean swap;
    private boolean hand;
    private final StopWatchShadow swapWatch = new StopWatchShadow();
@@ -49,7 +50,7 @@ public class AutoSwap extends Module {
    private String bypassItemName = "";
 
    public AutoSwap() {
-      this.addSettings(new Setting[]{firstItemSetting, secondItemSetting, bind, swaprender, onlyEnchanted});
+      this.addSettings(new Setting[]{firstItemSetting, secondItemSetting, bind, swaprender, onlyEnchanted, tripleSwap});
    }
 
    @EventInit
@@ -123,12 +124,28 @@ public class AutoSwap extends Module {
       ScreenHandler screenHandler = mc.player.currentScreenHandler;
       int slot = item == Items.TOTEM_OF_UNDYING ? InvUtil.find(item, false, onlyEnchanted) : InvUtil.find(item);
       if (slot != -1) {
-         MovementManager.getInstance().lockMovement("AutoSwap");
-         this.bypassActive = true;
-         this.bypassSwapped = false;
-         this.bypassSlot = slot;
-         this.bypassItemName = itemName;
-         this.swapWatch.reset();
+         if (tripleSwap.get()) {
+            // Triple swap: pickup → offhand → pickup (works without closing screen)
+            int adjustedSlot = slot < 9 ? slot + 36 : slot;
+            mc.interactionManager.clickSlot(screenHandler.syncId, adjustedSlot, 0, SlotActionType.PICKUP, mc.player);
+            mc.interactionManager.clickSlot(screenHandler.syncId, 45, 0, SlotActionType.PICKUP, mc.player);
+            mc.interactionManager.clickSlot(screenHandler.syncId, adjustedSlot, 0, SlotActionType.PICKUP, mc.player);
+            if (swaprender.get() && mc.player != null) {
+               Rubin.get.manager.get(Hud.class)
+                  .showNotification("warn", "AutoSwap - свапнул на " + itemName, 1200L, Renderer2D.ColorUtil.getTextTwoColor(1, 1));
+               Text msg = Text.literal("AutoSwap - свапнул на ")
+                  .formatted(Formatting.WHITE)
+                  .append(Text.literal(itemName).formatted(Formatting.RED));
+               mc.player.sendMessage(msg, false);
+            }
+         } else {
+            MovementManager.getInstance().lockMovement("AutoSwap");
+            this.bypassActive = true;
+            this.bypassSwapped = false;
+            this.bypassSlot = slot;
+            this.bypassItemName = itemName;
+            this.swapWatch.reset();
+         }
       }
 
       this.swap = false;
