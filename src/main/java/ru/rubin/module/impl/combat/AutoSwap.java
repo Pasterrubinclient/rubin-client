@@ -111,6 +111,8 @@ public class AutoSwap extends Module {
       }
    }
 
+   private boolean tripleKeyWasPressed = false;
+
    private void updateTripleSwap() {
       int key = bind.get();
       if (key <= 0) return;
@@ -123,9 +125,10 @@ public class AutoSwap extends Module {
          pressed = GLFW.glfwGetKey(handle, key) == GLFW.GLFW_PRESS;
       }
 
-      if (pressed && mc.currentScreen == null && !(mc.currentScreen instanceof AutoSwapWheelScreen)) {
+      if (pressed && !tripleKeyWasPressed && mc.currentScreen == null) {
          mc.setScreen(new AutoSwapWheelScreen(this));
       }
+      tripleKeyWasPressed = pressed;
    }
 
    public void tripleSwapItem(Item item, String name) {
