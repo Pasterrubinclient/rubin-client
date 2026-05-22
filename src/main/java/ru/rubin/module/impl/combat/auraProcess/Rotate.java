@@ -127,11 +127,7 @@ public final class Rotate implements IMinecraft {
    public static void onSpookyTimeDeluxeRotation(LivingEntity target, boolean isAttack) {
       if (mc.player == null || target == null) return;
 
-      Vec3d targetPos = AuraUtil.getVector3(target);
-      float currentYaw = FreeLookUtil.freeYaw;
-      float currentPitch = FreeLookUtil.freePitch;
-
-
+      // Predictive aim point
       double distToTarget = mc.player.distanceTo(target);
       float targetYawRaw = target.getYaw();
       float yawDelta = net.minecraft.util.math.MathHelper.wrapDegrees(target.getYaw() - target.lastYaw);
@@ -147,27 +143,17 @@ public final class Rotate implements IMinecraft {
       float yawToTarget = (float) Math.toDegrees(Math.atan2(-aimVec.x, aimVec.z));
       float pitchToTarget = (float) MathHelper.clamp(-Math.toDegrees(Math.atan2(aimVec.y, Math.hypot(aimVec.x, aimVec.z))), -90.0, 90.0);
 
-      float yawDiff = MathHelper.wrapDegrees(yawToTarget - currentYaw);
-      float pitchDiff = MathHelper.wrapDegrees(pitchToTarget - currentPitch);
-
-      // Speed clamping
-      float clampedYaw = Math.min(Math.max(Math.abs(yawDiff), 1.0f), 50.2f);
-      float clampedPitch = Math.min(Math.max(Math.abs(pitchDiff), 1.0f), 16.2f);
-
-      float newTargetYaw = currentYaw + (yawDiff > 0 ? clampedYaw : -clampedYaw);
-      float newTargetPitch = currentPitch + (pitchDiff > 0 ? clampedPitch : -clampedPitch);
-
-      // Lerp for smoothness
-      float yaw = MathHelper.lerp(0.977f, currentYaw, newTargetYaw);
-      float pitch = MathHelper.lerp(0.977f, currentPitch, newTargetPitch);
-
       // Jitter
-      yaw += ThreadLocalRandom.current().nextFloat(-3.0f, 3.0f);
-      pitch += ThreadLocalRandom.current().nextFloat(-3.0f, 3.0f);
-      pitch = MathHelper.clamp(pitch, -90.0f, 90.0f);
+      yawToTarget += ThreadLocalRandom.current().nextFloat(-2.0f, 2.0f);
+      pitchToTarget += ThreadLocalRandom.current().nextFloat(-1.5f, 1.5f);
+      pitchToTarget = MathHelper.clamp(pitchToTarget, -90.0f, 90.0f);
 
-      Rotation newRotation = new Rotation(yaw, pitch);
-      RotationProcess.update(newRotation, 360.0f, 360.0f, 23.0f, 23.0f, 0, 15, false);
+      // Always track target, faster when attacking
+      float yawSpeed = isAttack ? Mathf.randomValue(70.0f, 120.0f) : Mathf.randomValue(30.0f, 50.0f);
+      float pitchSpeed = isAttack ? Mathf.randomValue(20.0f, 40.0f) : Mathf.randomValue(10.0f, 20.0f);
+
+      Rotation newRotation = new Rotation(yawToTarget, pitchToTarget);
+      RotationProcess.update(newRotation, yawSpeed, pitchSpeed, 25.0f, 25.0f, 0, 15, false);
    }
 
    public static void onHolyRotation(LivingEntity target, boolean attack) {
