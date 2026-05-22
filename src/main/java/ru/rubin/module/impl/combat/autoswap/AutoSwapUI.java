@@ -100,22 +100,23 @@ public class AutoSwapUI extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.gui.Click click, boolean doubled) {
+        int mouseX = (int) click.x();
+        int mouseY = (int) click.y();
+        int button = click.button();
         if (hoveredSlot >= 0 && hoveredSlot < AutoSwapModule.SEGMENT_COUNT) {
             if (button == 0) {
-                // Left click on empty slot → open inventory selector
                 ItemStack stack = module.getWheelItemStack(hoveredSlot);
                 if (stack.isEmpty()) {
                     client.setScreen(new AutoSwapInventoryScreen(this, module, hoveredSlot));
                     return true;
                 }
             } else if (button == 1) {
-                // Right click → clear slot
                 module.setWheelItem(hoveredSlot, ItemStack.EMPTY);
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override

@@ -20,8 +20,8 @@ public class AutoSwapInventoryScreen extends InventoryScreen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0) {
+    public boolean mouseClicked(net.minecraft.client.gui.Click click, boolean doubled) {
+        if (click.button() == 0) {
             Slot focusedSlot = ((HandledScreenAccessor) this).rubin$getFocusedSlot();
             if (focusedSlot != null && focusedSlot.hasStack()) {
                 ItemStack stack = focusedSlot.getStack();
@@ -30,7 +30,7 @@ public class AutoSwapInventoryScreen extends InventoryScreen {
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override
