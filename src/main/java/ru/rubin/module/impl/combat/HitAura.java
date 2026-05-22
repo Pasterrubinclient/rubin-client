@@ -49,7 +49,7 @@ import ru.rubin.util.player.PlayerUtil;
 public class HitAura extends Module {
    public static SliderSetting attackRange = new SliderSetting("Радиус атаки", 3.0F, 3.0F, 6.0F, 0.1F, false);
    public static SliderSetting preRange = new SliderSetting("Радиус обнаружения", 1.0F, 0.0F, 5.0F, 0.1F, false);
-   public static ModeSetting rotationType = new ModeSetting("Режим ротации", "Adapted", "Adapted", "Polar", "Snap", "TriggerBot", "FunTime Smooth", "SpookyTime");
+   public static ModeSetting rotationType = new ModeSetting("Режим ротации", "Adapted", "Adapted", "Polar", "Snap", "TriggerBot", "FunTime Smooth", "SpookyTime", "Neural");
    public static ModeSetting snapSetting = new ModeSetting("Режим снапа", "Fast", "Fast", "Smooth", "Random").hidden(() -> !rotationType.is("Snap"));
    public static MultiBooleanSetting targets = new MultiBooleanSetting(
       "Цели", new BooleanSetting("Игроки", true), new BooleanSetting("Голые", true), new BooleanSetting("Мобы", true)
@@ -191,6 +191,9 @@ public class HitAura extends Module {
             break;
          case "SpookyTime":
             Rotate.onSpookyTimeDeluxeRotation(target, canAttack);
+            break;
+         case "Neural":
+            ru.rubin.module.impl.combat.auraProcess.NeuralRotation.apply(target, canAttack);
             break;
       }
    }
