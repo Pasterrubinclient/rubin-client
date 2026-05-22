@@ -122,6 +122,54 @@ public final class Rotate implements IMinecraft {
       RotationProcess.update(newRotation, Mathf.randomInt(90, 110), Mathf.randomValue(16.0F, 21.0F), 30.0F, 30.0F, 1, 15, false);
    }
 
+   private static float spookySnapTicks = 0.0f;
+
+   public static void onSpookyTimeDeluxeRotation(LivingEntity target, boolean isAttack) {
+      if (mc.player == null || target == null) return;
+
+      Vec3d targetPos = AuraUtil.getVector3(target);
+      float currentYaw = FreeLookUtil.freeYaw;
+      float currentPitch = FreeLookUtil.freePitch;
+
+      // Predictive aim point
+      double distToTarget = mc.player.distanceTo(target);
+      float targetYawRaw = target.getYaw();
+      float yawDelta = net.minecraft.util.math.MathHelper.wrapDegrees(target.getYaw() - target.prevYaw);
+      float predictStrength = distToTarget <= 2.0 ? 0.19f : 0.15f;
+      if (distToTarget > 2.0) {
+         targetYawRaw += yawDelta * 2.5f;
+      }
+      double yawRad = Math.toRadians(targetYawRaw);
+      Vec3d forward = new Vec3d(-Math.sin(yawRad), 0.0, Math.cos(yawRad));
+      Vec3d predictedPos = target.getPos().add(forward.multiply(predictStrength)).add(0.0, target.getHeight() * 0.7, 0.0);
+      Vec3d aimVec = predictedPos.subtract(mc.player.getEyePos());
+
+      float yawToTarget = (float) Math.toDegrees(Math.atan2(-aimVec.x, aimVec.z));
+      float pitchToTarget = (float) MathHelper.clamp(-Math.toDegrees(Math.atan2(aimVec.y, Math.hypot(aimVec.x, aimVec.z))), -90.0, 90.0);
+
+      float yawDiff = MathHelper.wrapDegrees(yawToTarget - currentYaw);
+      float pitchDiff = MathHelper.wrapDegrees(pitchToTarget - currentPitch);
+
+      // Speed clamping
+      float clampedYaw = Math.min(Math.max(Math.abs(yawDiff), 1.0f), 50.2f);
+      float clampedPitch = Math.min(Math.max(Math.abs(pitchDiff), 1.0f), 16.2f);
+
+      float newTargetYaw = currentYaw + (yawDiff > 0 ? clampedYaw : -clampedYaw);
+      float newTargetPitch = currentPitch + (pitchDiff > 0 ? clampedPitch : -clampedPitch);
+
+      // Lerp for smoothness
+      float yaw = MathHelper.lerp(0.977f, currentYaw, newTargetYaw);
+      float pitch = MathHelper.lerp(0.977f, currentPitch, newTargetPitch);
+
+      // Jitter
+      yaw += ThreadLocalRandom.current().nextFloat(-3.0f, 3.0f);
+      pitch += ThreadLocalRandom.current().nextFloat(-3.0f, 3.0f);
+      pitch = MathHelper.clamp(pitch, -90.0f, 90.0f);
+
+      Rotation newRotation = new Rotation(yaw, pitch);
+      RotationProcess.update(newRotation, 360.0f, 360.0f, 23.0f, 23.0f, 0, 15, false);
+   }
+
    public static void onHolyRotation(LivingEntity target, boolean attack) {
       float addyVacY = 0.3F * (float)Math.cos(System.currentTimeMillis() / 2200.0);
       float addyVacZ = 0.03F * (float)Math.sin(System.currentTimeMillis() / 900.0) + 0.06F * (float)Math.cos(System.currentTimeMillis() / 1200.0);
