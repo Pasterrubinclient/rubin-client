@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "BeautifulHandsMixin",
+    "ChamsMixin",
     "RenderLayerMultiPhaseMixin",
     "RenderSystemMixin",
     "RenderPhaseMixin",

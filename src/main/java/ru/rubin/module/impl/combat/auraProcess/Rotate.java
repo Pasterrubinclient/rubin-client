@@ -131,7 +131,7 @@ public final class Rotate implements IMinecraft {
       float currentYaw = FreeLookUtil.freeYaw;
       float currentPitch = FreeLookUtil.freePitch;
 
-      // Predictive aim point
+
       double distToTarget = mc.player.distanceTo(target);
       float targetYawRaw = target.getYaw();
       float yawDelta = net.minecraft.util.math.MathHelper.wrapDegrees(target.getYaw() - target.prevYaw);
@@ -320,7 +320,7 @@ public final class Rotate implements IMinecraft {
               -Math.toDegrees(Math.atan2(directionVec.y, Math.hypot(directionVec.x, directionVec.z))), -90.0, 90.0
       );
 
-      // Speed: fast when can attack, slow otherwise
+
       float yawSpeed;
       float pitchSpeed;
       if (canAttack) {
@@ -331,14 +331,14 @@ public final class Rotate implements IMinecraft {
          pitchSpeed = Mathf.randomValue(5.0f, 10.0f);
       }
 
-      // CoreDLC-style noise based on time and count
+
       long time = System.currentTimeMillis();
       float yawNoise = (float) (Math.sin(time / (double) (300 + ftSmoothCount % 100)) * 0.8 
               + Math.cos(time / (double) (500 + ftSmoothCount % 80)) * 0.6);
       float pitchNoise = (float) (Math.sin(time / (double) (400 + ftSmoothCount % 120)) * 0.5 
               + Math.cos(time / (double) (600 + ftSmoothCount % 90)) * 0.4);
 
-      // Idle jitter when not attacking recently
+
       float idleYaw = 0.0f;
       float idlePitch = 0.0f;
       if (elapsed < 2000) {
