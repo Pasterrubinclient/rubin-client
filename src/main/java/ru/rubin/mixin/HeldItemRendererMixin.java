@@ -63,6 +63,17 @@ public abstract class HeldItemRendererMixin {
     ) {
         RenderItemEvent renderItemEvent = new RenderItemEvent(matrices, hand);
         EventManager.call(renderItemEvent);
+        ru.rubin.module.impl.visuals.GlassHands.preRender();
+    }
+
+    @Inject(
+            method = {"renderFirstPersonItem"},
+            at = {@At("TAIL")}
+    )
+    private void onRenderFirstPersonItemTail(
+            AbstractClientPlayerEntity player, float tickProgress, float pitch, Hand hand, float swingProgress, ItemStack stack, float equipProgress, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, CallbackInfo ci
+    ) {
+        ru.rubin.module.impl.visuals.GlassHands.postRender();
     }
 
     @Redirect(

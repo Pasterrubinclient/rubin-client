@@ -47,9 +47,9 @@ public class AutoSwap extends Module {
    public static BooleanSetting onlyEnchanted = new BooleanSetting("Только Чар. тотемы", false)
            .hidden(() -> swapType.is("Тройной"));
 
-   // Triple swap wheel items
+   // Triple swap wheel items (empty by default, filled via inventory picker)
    private final ItemStack[] wheelItems = new ItemStack[]{ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY};
-   private boolean wheelOpen = false;
+   private boolean tripleKeyWasPressed = false;
 
    private boolean swap;
    private boolean hand;
@@ -110,8 +110,6 @@ public class AutoSwap extends Module {
          }
       }
    }
-
-   private boolean tripleKeyWasPressed = false;
 
    private void updateTripleSwap() {
       int key = bind.get();
@@ -181,6 +179,16 @@ public class AutoSwap extends Module {
    public void onDisable() {
       super.onDisable();
       MovementManager.getInstance().unlockMovement("AutoSwap");
+   }
+
+   public ItemStack getWheelItem(int index) {
+      if (index < 0 || index >= 3) return ItemStack.EMPTY;
+      return wheelItems[index] == null ? ItemStack.EMPTY : wheelItems[index];
+   }
+
+   public void setWheelItem(int index, ItemStack stack) {
+      if (index < 0 || index >= 3) return;
+      wheelItems[index] = stack == null || stack.isEmpty() ? ItemStack.EMPTY : stack.copy();
    }
 
    public int getBindKey() {

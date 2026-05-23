@@ -66,4 +66,15 @@ public abstract class CameraMixin {
    private void onUpdateReturn(CallbackInfo ci) {
       this.Rubin$rotationEvent = null;
    }
+
+   @Inject(
+      method = {"clipToSpace"},
+      at = {@At("HEAD")},
+      cancellable = true
+   )
+   private void onClipToSpace(float desiredCameraDistance, org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Float> cir) {
+      if (ru.rubin.module.impl.misc.CameraClip.isActive()) {
+         cir.setReturnValue(ru.rubin.module.impl.misc.CameraClip.getDistance());
+      }
+   }
 }
